@@ -1,0 +1,548 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --blue: #1d9bf0;
+  --blue-dark: #1a8cd8;
+  --bg: #eff3f4;
+  --surface: #ffffff;
+  --border: #cfd9de;
+  --border-focus: #1d9bf0;
+  --text: #0f1419;
+  --text-secondary: #536471;
+  --green: #00ba7c;
+  --yellow: #f4b400;
+  --red: #e0245e;
+  --radius-card: 16px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-hover: 0 4px 16px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15202b;
+    --surface: #1e2732;
+    --border: #38444d;
+    --text: #e7e9ea;
+    --text-secondary: #8b98a5;
+    --shadow: 0 1px 4px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04);
+    --shadow-hover: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  }
+}
+
+html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Header ─────────────────────────────────── */
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.header-inner {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.header-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.app-title {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--text);
+}
+
+.app-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  margin-left: 36px;
+}
+
+/* ── Main Layout ─────────────────────────────── */
+.app-main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Input Section ───────────────────────────── */
+.input-section {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.total-chars {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.input-textarea {
+  width: 100%;
+  min-height: 150px;
+  max-height: 380px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--bg);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.input-textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.15);
+}
+
+.input-textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+  font-size: 14px;
+}
+
+/* ── Toolbar ─────────────────────────────────── */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tweet-count {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Toggle ──────────────────────────────────── */
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-track {
+  width: 42px;
+  height: 24px;
+  background: var(--border);
+  border-radius: 12px;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+.toggle-input:checked + .toggle-track {
+  background: var(--blue);
+}
+
+.toggle-input:checked + .toggle-track::after {
+  transform: translateX(18px);
+}
+
+.toggle-label:hover .toggle-track {
+  opacity: 0.85;
+}
+
+.toggle-text {
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* ── Buttons ─────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: background 0.15s, opacity 0.15s, transform 0.1s, color 0.15s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.btn-primary {
+  background: var(--blue);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--blue-dark);
+}
+
+.btn-primary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-copy {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 16px;
+}
+
+.btn-copy:hover {
+  background: rgba(29, 155, 240, 0.06);
+  color: var(--blue);
+  border-color: var(--blue);
+}
+
+.btn-copy.copied,
+.btn-primary.copied {
+  background: var(--green) !important;
+  color: white !important;
+  border-color: var(--green) !important;
+}
+
+/* ── Output Section ──────────────────────────── */
+.output-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 56px 24px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.empty-icon {
+  display: block;
+  margin: 0 auto 16px;
+  color: var(--text-secondary);
+}
+
+/* ── Tweet Card ──────────────────────────────── */
+.tweet-card {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
+  padding: 16px 20px;
+  border: 1.5px solid var(--border);
+  transition: box-shadow 0.2s, border-color 0.2s;
+  animation: cardIn 0.18s ease forwards;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.tweet-card:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.tweet-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.tweet-number {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--blue);
+  background: rgba(29, 155, 240, 0.1);
+  padding: 3px 10px;
+  border-radius: 12px;
+  letter-spacing: 0.3px;
+}
+
+.tweet-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tweet-chars {
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 52px;
+  text-align: right;
+}
+
+.tweet-chars.ok     { color: var(--text-secondary); }
+.tweet-chars.warn   { color: var(--yellow); }
+.tweet-chars.danger { color: var(--red); }
+
+.tweet-card-body {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* ── Progress bar at bottom of card ─────────── */
+.tweet-progress {
+  margin-top: 12px;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.tweet-progress-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.tweet-progress-bar.ok     { background: var(--blue); }
+.tweet-progress-bar.warn   { background: var(--yellow); }
+.tweet-progress-bar.danger { background: var(--red); }
+
+/* ── Split suggestions (inline) ──────────────────── */
+.text-segment {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.tweet-suffix {
+  color: var(--text-secondary);
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+/* Inline wrapper — stays in the text flow */
+.split-suggest {
+  display: inline;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.split-suggest-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Clickable area wider than the visible icon */
+  padding: 0 5px;
+  height: 1.3em;
+  vertical-align: middle;
+  background: none;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0.35;
+  transition: opacity 0.15s, background 0.12s, transform 0.08s;
+  line-height: 1;
+}
+
+.split-suggest-btn:hover,
+.split-suggest-btn:focus-visible {
+  opacity: 1;
+}
+
+.split-suggest-btn:active {
+  transform: scale(0.9);
+}
+
+.split-suggest-btn:hover {
+  border-radius: 4px;
+}
+
+.split-suggest.split-back .split-suggest-btn {
+  color: var(--blue);
+}
+
+.split-suggest.split-back .split-suggest-btn:hover {
+  background: rgba(29, 155, 240, 0.12);
+}
+
+.split-suggest.split-front .split-suggest-btn {
+  color: var(--green);
+}
+
+.split-suggest.split-front .split-suggest-btn:hover {
+  background: rgba(0, 186, 124, 0.12);
+}
+
+/* ── Merge-all button (end of card body) ─────────── */
+.merge-all-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  color: var(--green);
+  opacity: 0.45;
+  transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.merge-all-row:hover {
+  opacity: 1;
+}
+
+.merge-all-line {
+  flex: 1;
+  height: 0;
+  border-top: 1.5px dashed currentColor;
+  pointer-events: none;
+}
+
+.merge-all-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  padding: 3px 12px;
+  border-radius: 12px;
+  border: 1.5px solid currentColor;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  color: inherit;
+  line-height: 1.5;
+  transition: background 0.12s, transform 0.08s;
+}
+
+.merge-all-btn:hover {
+  background: rgba(0, 186, 124, 0.12);
+}
+
+.merge-all-btn:active {
+  transform: scale(0.95);
+}
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 480px) {
+  .app-header {
+    padding: 12px 16px;
+  }
+
+  .app-subtitle {
+    margin-left: 0;
+  }
+
+  .app-main {
+    padding: 14px 12px 40px;
+    gap: 12px;
+  }
+
+  .input-section {
+    padding: 14px 14px;
+  }
+
+  .tweet-card {
+    padding: 14px 14px;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .toolbar-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

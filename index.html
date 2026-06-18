@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1d9bf0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="TanuTweet">
+  <title>TanuTweet</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-title-row">
+        <svg class="header-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="8" fill="#1d9bf0"/>
+          <path d="M8 10h16M8 16h10M8 22h13" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="24" cy="22" r="3.5" fill="white"/>
+          <path d="M22.5 22l1 1 2-2" stroke="#1d9bf0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1 class="app-title">TanuTweet</h1>
+      </div>
+      <p class="app-subtitle">長文を X スレッドに分割</p>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <section class="input-section">
+      <div class="input-meta">
+        <label class="input-label" for="input-text">テキストを貼り付け</label>
+        <span class="total-chars" id="total-chars">0 文字</span>
+      </div>
+      <textarea
+        id="input-text"
+        class="input-textarea"
+        placeholder="ここに長文を貼り付けると、Post の区切り位置をサジェストします。&#10;全角文字は 2、半角文字は 1 として 280 文字以内に分割されます。"
+        spellcheck="false"
+        autocomplete="off"
+      ></textarea>
+
+      <div class="toolbar">
+        <label class="toggle-label">
+          <input type="checkbox" id="numbering-toggle" class="toggle-input" checked>
+          <span class="toggle-track"></span>
+          <span class="toggle-text">(1/n) 番号を付ける</span>
+        </label>
+
+        <div class="toolbar-right">
+          <span class="tweet-count" id="tweet-count"></span>
+          <button id="copy-all-btn" class="btn btn-primary" disabled>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            全てコピー
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="output-section" id="output-section">
+      <div class="empty-state" id="empty-state">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="empty-icon">
+          <rect x="8" y="12" width="32" height="4" rx="2" fill="currentColor" opacity="0.2"/>
+          <rect x="8" y="22" width="24" height="4" rx="2" fill="currentColor" opacity="0.2"/>
+          <rect x="8" y="32" width="28" height="4" rx="2" fill="currentColor" opacity="0.2"/>
+        </svg>
+        <p>テキストを入力すると<br>ここに分割結果が表示されます</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
