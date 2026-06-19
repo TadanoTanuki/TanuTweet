@@ -273,12 +273,15 @@ html {
 }
 
 .btn-primary {
-  background: var(--blue);
-  color: white;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--blue-dark);
+  background: rgba(29, 155, 240, 0.06);
+  color: var(--blue);
+  border-color: var(--blue);
 }
 
 .btn-primary:disabled {
@@ -309,9 +312,9 @@ html {
 }
 
 .btn-copy {
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1.5px solid var(--border);
+  background: var(--blue);
+  color: white;
+  border: 1.5px solid transparent;
   padding: 5px 12px;
   font-size: 12px;
   font-weight: 600;
@@ -319,9 +322,7 @@ html {
 }
 
 .btn-copy:hover {
-  background: rgba(29, 155, 240, 0.06);
-  color: var(--blue);
-  border-color: var(--blue);
+  background: var(--blue-dark);
 }
 
 .btn-copy.copied,
