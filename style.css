@@ -80,6 +80,12 @@ html {
   letter-spacing: -0.3px;
   color: var(--text);
 }
+.app-version {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted, #8899aa);
+  letter-spacing: 0;
+}
 
 .app-subtitle {
   font-size: 12px;
