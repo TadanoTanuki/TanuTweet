@@ -360,9 +360,11 @@ html {
   height: 18px;
   border-radius: 4px;
   border: 1.5px solid var(--border);
-  color: var(--text-secondary);
   vertical-align: middle;
 }
+
+.edit-guide-btn--up   { color: var(--green); }
+.edit-guide-btn--down { color: var(--blue);  }
 
 .edit-guide.hidden {
   display: none;
