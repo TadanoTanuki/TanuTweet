@@ -379,6 +379,7 @@ function applyFrontSplit(postIndex, charPos) {
 // Inline split/merge icons (no text, icon only)
 const ICON_SPLIT    = `<svg width="10" height="14" viewBox="0 0 10 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="1" x2="5" y2="10"/><path d="M2 7 L5 11 L8 7"/></svg>`;
 const ICON_MERGE_UP = `<svg width="10" height="14" viewBox="0 0 10 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="13" x2="5" y2="4"/><path d="M2 7 L5 3 L8 7"/></svg>`;
+const ICON_SCISSORS_SMALL = `<svg width="12" height="12" viewBox="0 0 32 32" fill="none"><g transform="translate(16,16) rotate(45) scale(0.038) translate(-256,-256)" fill="currentColor" stroke="currentColor" stroke-width="18" stroke-linejoin="round"><path d="M211.875,291.59l-8.506-13.629c-0.014,0.024-0.025,0.043-0.041,0.063l-0.094-0.149c-9.273,14.539-15.207,23.981-15.207,23.981c-44.285,70.437-97.008,194.101-74.949,207.886l1.504,1.004c3.342,2.09,7.353,1.504,9.107-1.336l112.549-179.144l-4.26-6.77L211.875,291.59z"/><path d="M437.191,10.833c-37.35-23.48-89.822-7.52-116.978,35.594c-10.443,16.711-15.625,35.008-15.791,52.641c-0.168,12.367-3.928,24.312-10.445,34.676c-4.93,7.856-11.281,17.797-18.215,28.91c0.668,1.086,1.42,2.172,2.088,3.258l16.963,26.988c4.93,7.856,9.942,15.711,14.705,23.398c18.299-21.808,44.451-36.348,73.279-38.437c27.572-2.004,55.562-18.465,72.943-46.203C482.812,88.54,474.457,34.313,437.191,10.833z M423.07,111.102c-14.623,23.308-42.279,32.332-61.664,20.218c-19.301-12.199-23.144-41.027-8.523-64.34c14.623-23.308,42.363-32.336,61.664-20.219c4.832,3.039,8.696,7.117,11.549,11.883c0.025,0.039,0.047,0.086,0.072,0.129c1.381,2.324,2.516,4.813,3.412,7.426c0.037,0.106,0.068,0.219,0.106,0.324C434.171,79.966,432.218,96.598,423.07,111.102z"/><path d="M213.094,262.082l0.668,1.004l-0.5-1.172C213.261,262,213.177,262,213.094,262.082z"/><path d="M286.205,241.946c-11.698-18.547-24.565-39.101-36.596-58.234c-12.285-19.469-23.564-37.434-31.586-49.969c-6.6-10.363-10.194-22.308-10.36-34.676c-0.252-17.633-5.348-35.93-15.875-52.641c-18.635-29.578-49.215-46.371-78.627-46.371c-2.256,0-4.428,0.082-6.686,0.25c-11.029,1-21.807,4.426-31.584,10.527C37.461,34.313,29.188,88.54,56.344,131.657c17.379,27.738,45.287,44.199,72.945,46.203c34.174,2.508,64.754,22.562,83.053,51.554l11.281,17.965l36.596,58.32l128.176,203.71c1.002,1.668,2.924,2.59,4.93,2.59c0.168,0,0.418,0,0.584-0.086c1.254-0.082,2.424-0.5,3.51-1.168l1.588-1.004c22.058-13.785-30.748-137.449-75.033-207.886C323.972,301.856,307.177,275.118,286.205,241.946z M150.594,131.321c-4.846,3.008-10.278,4.762-15.791,5.262c-1.086,0.086-2.256,0.168-3.342,0.168c-15.709,0-32.254-9.36-42.531-25.648c-14.621-23.313-10.777-52.141,8.523-64.34c4.846-3.008,10.278-4.68,15.875-5.18c1.086-0.086,2.174-0.168,3.344-0.168c15.625,0,32.168,9.274,42.445,25.566C173.74,90.294,169.98,119.122,150.594,131.321z M256.711,265.594c-0.586,0.086-1.17,0.086-1.754,0.086c-10.112,0-18.801-7.773-19.721-18.133c-0.92-10.863,7.104-20.472,18.049-21.476c0.584,0,1.17-0.082,1.754-0.082c10.195,0,18.8,7.77,19.718,18.133C275.761,254.981,267.656,264.676,256.711,265.594z"/></g></svg>`;
 
 const COPY_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
 const CHECK_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
@@ -555,7 +556,7 @@ function createCard(postIndex, total) {
   const prevBtn = document.createElement('button');
   prevBtn.type = 'button';
   if (isEditing) {
-    prevBtn.innerHTML = ICON_MERGE_UP;
+    prevBtn.innerHTML = `<span class="merge-icon-pair">${ICON_MERGE_UP}${ICON_SCISSORS_SMALL}</span>`;
     prevBtn.setAttribute('aria-label', '前のPostに結合');
     prevBtn.style.visibility = canMergeUp ? 'visible' : 'hidden';
     prevBtn.disabled = true; // pos=0 initially → nothing before cursor
@@ -587,7 +588,7 @@ function createCard(postIndex, total) {
   const nextBtn = document.createElement('button');
   nextBtn.type = 'button';
   if (isEditing) {
-    nextBtn.innerHTML = ICON_SPLIT;
+    nextBtn.innerHTML = `<span class="merge-icon-pair">${ICON_SPLIT}${ICON_SCISSORS_SMALL}</span>`;
     nextBtn.setAttribute('aria-label', '次のPostと結合');
     nextBtn.style.visibility = canMergeDown ? 'visible' : 'hidden';
     // pos=0 initially → all text is after cursor → nextBtn enabled (unless text empty)

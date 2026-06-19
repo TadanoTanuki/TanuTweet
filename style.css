@@ -368,8 +368,15 @@ html {
   flex-shrink: 0;
 }
 
+.merge-icon-pair {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .edit-nav-arrow {
-  width: 20px;
+  width: auto;
+  min-width: 20px;
   height: 20px;
   display: flex;
   align-items: center;
