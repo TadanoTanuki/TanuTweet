@@ -493,7 +493,7 @@ function buildCardBody(rawText, postIndex, total) {
 }
 
 function createCard(postIndex, total) {
-  const rawText     = posts[postIndex];
+  const rawText     = posts[postIndex].replace(/ \(\d+\/\d+\)\s*$/, '');
   const suffix      = toggleEl.checked ? ` (${postIndex + 1}/${total})` : '';
   const displayText = rawText + suffix;
   const isEditing   = postIndex === editingIndex;
@@ -730,9 +730,10 @@ function renderFromPosts() {
   toolbarArrow.hidden = false;
   tweetCountEl.textContent = `${total} Posts`;
   copyAllBtn.disabled = false;
-  currentTweets = posts.map((t, i) =>
-    toggleEl.checked ? `${t} (${i + 1}/${total})` : t
-  );
+  currentTweets = posts.map((t, i) => {
+    const clean = t.replace(/ \(\d+\/\d+\)\s*$/, '');
+    return toggleEl.checked ? `${clean} (${i + 1}/${total})` : clean;
+  });
 
   const frag = document.createDocumentFragment();
   for (let i = 0; i < total; i++) frag.appendChild(createCard(i, total));
