@@ -558,8 +558,8 @@ function createCard(postIndex, total) {
     prevBtn.innerHTML = ICON_MERGE_UP;
     prevBtn.setAttribute('aria-label', '前のPostに結合');
     prevBtn.style.visibility = canMergeUp ? 'visible' : 'hidden';
-    prevBtn.className = canMergeUp
-      ? `edit-nav-arrow ${mergeUpClass(rawText, rawText.length)}` : 'edit-nav-arrow';
+    prevBtn.disabled = true; // pos=0 initially → nothing before cursor
+    prevBtn.className = 'edit-nav-arrow';
     if (canMergeUp) {
       prevBtn.addEventListener('mousedown', () => {
         if (taEl) lastCursorPos = taEl.selectionStart;
@@ -590,8 +590,10 @@ function createCard(postIndex, total) {
     nextBtn.innerHTML = ICON_SPLIT;
     nextBtn.setAttribute('aria-label', '次のPostと結合');
     nextBtn.style.visibility = canMergeDown ? 'visible' : 'hidden';
-    nextBtn.className = canMergeDown
-      ? `edit-nav-arrow ${mergeDownClass(rawText, rawText.length)}` : 'edit-nav-arrow';
+    // pos=0 initially → all text is after cursor → nextBtn enabled (unless text empty)
+    nextBtn.disabled = canMergeDown && rawText.length === 0;
+    nextBtn.className = canMergeDown && rawText.length > 0
+      ? `edit-nav-arrow ${mergeDownClass(rawText, 0)}` : 'edit-nav-arrow';
     if (canMergeDown) {
       nextBtn.addEventListener('mousedown', () => {
         if (taEl) lastCursorPos = taEl.selectionStart;
@@ -650,8 +652,16 @@ function createCard(postIndex, total) {
 
     const updateMergeBtnColors = () => {
       lastCursorPos = ta.selectionStart;
-      if (canMergeUp)   prevBtn.className = `edit-nav-arrow ${mergeUpClass(ta.value, lastCursorPos)}`;
-      if (canMergeDown) nextBtn.className = `edit-nav-arrow ${mergeDownClass(ta.value, lastCursorPos)}`;
+      if (canMergeUp) {
+        const atStart = lastCursorPos === 0;
+        prevBtn.disabled = atStart;
+        prevBtn.className = atStart ? 'edit-nav-arrow' : `edit-nav-arrow ${mergeUpClass(ta.value, lastCursorPos)}`;
+      }
+      if (canMergeDown) {
+        const atEnd = lastCursorPos === ta.value.length;
+        nextBtn.disabled = atEnd;
+        nextBtn.className = atEnd ? 'edit-nav-arrow' : `edit-nav-arrow ${mergeDownClass(ta.value, lastCursorPos)}`;
+      }
     };
 
     ta.addEventListener('input', () => {
