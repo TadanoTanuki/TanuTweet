@@ -164,6 +164,30 @@ function navigateHistory(postIndex, dir) {
   renderFromPosts();
 }
 
+function mergeWithPrev(postIndex, editedText) {
+  if (postIndex <= 0) return;
+  const sep = postSeparators[postIndex - 1] || '';
+  posts[postIndex - 1] = posts[postIndex - 1].trimEnd() + sep + editedText;
+  posts.splice(postIndex, 1);
+  postSeparators.splice(postIndex - 1, 1);
+  editingIndex  = -1;
+  editStartText = '';
+  cardHistories = posts.map(t => ({ entries: [t], cursor: 0 }));
+  renderFromPosts();
+}
+
+function mergeWithNext(postIndex, editedText) {
+  if (postIndex >= posts.length - 1) return;
+  const sep = postSeparators[postIndex] || '';
+  posts[postIndex] = editedText + sep + posts[postIndex + 1];
+  posts.splice(postIndex + 1, 1);
+  postSeparators.splice(postIndex, 1);
+  editingIndex  = -1;
+  editStartText = '';
+  cardHistories = posts.map(t => ({ entries: [t], cursor: 0 }));
+  renderFromPosts();
+}
+
 function showSaveDialog(postIndex, newText) {
   dialogEl.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
@@ -492,13 +516,41 @@ function createCard(postIndex, total) {
   const editNav = document.createElement('div');
   editNav.className = 'edit-nav';
 
+  // taEl is assigned when the edit textarea is created; merge-button closures capture it by ref
+  let taEl = null;
+
+  // Merge color helpers (used in edit mode only)
+  const mergeUpClass = (text) => {
+    const sep = postSeparators[postIndex - 1] || '';
+    return countUnits(posts[postIndex - 1].trimEnd() + sep + text) > LIMIT
+      ? 'merge-danger' : 'merge-up';
+  };
+  const mergeDownClass = (text) => {
+    const sep = postSeparators[postIndex] || '';
+    return countUnits(text + sep + posts[postIndex + 1]) > LIMIT
+      ? 'merge-danger' : 'merge-down';
+  };
+
+  const canMergeUp   = isEditing && postIndex > 0;
+  const canMergeDown = isEditing && postIndex < posts.length - 1;
+
   const prevBtn = document.createElement('button');
   prevBtn.type = 'button';
-  prevBtn.className = 'edit-nav-arrow';
-  prevBtn.textContent = '←';
-  prevBtn.setAttribute('aria-label', '前の編集に戻る');
-  prevBtn.style.visibility = hasPrev ? 'visible' : 'hidden';
-  if (hasPrev) prevBtn.addEventListener('click', () => navigateHistory(postIndex, -1));
+  if (isEditing) {
+    prevBtn.innerHTML = ICON_MERGE_UP;
+    prevBtn.setAttribute('aria-label', '前のPostに結合');
+    prevBtn.style.visibility = canMergeUp ? 'visible' : 'hidden';
+    prevBtn.className = canMergeUp
+      ? `edit-nav-arrow ${mergeUpClass(rawText)}` : 'edit-nav-arrow';
+    if (canMergeUp)
+      prevBtn.addEventListener('click', () => mergeWithPrev(postIndex, taEl ? taEl.value : rawText));
+  } else {
+    prevBtn.className = 'edit-nav-arrow';
+    prevBtn.textContent = '←';
+    prevBtn.setAttribute('aria-label', '前の編集に戻る');
+    prevBtn.style.visibility = hasPrev ? 'visible' : 'hidden';
+    if (hasPrev) prevBtn.addEventListener('click', () => navigateHistory(postIndex, -1));
+  }
   editNav.appendChild(prevBtn);
 
   const editBtn = document.createElement('button');
@@ -510,11 +562,21 @@ function createCard(postIndex, total) {
 
   const nextBtn = document.createElement('button');
   nextBtn.type = 'button';
-  nextBtn.className = 'edit-nav-arrow';
-  nextBtn.textContent = '→';
-  nextBtn.setAttribute('aria-label', '次の編集に進む');
-  nextBtn.style.visibility = hasNext ? 'visible' : 'hidden';
-  if (hasNext) nextBtn.addEventListener('click', () => navigateHistory(postIndex, 1));
+  if (isEditing) {
+    nextBtn.innerHTML = ICON_SPLIT;
+    nextBtn.setAttribute('aria-label', '次のPostと結合');
+    nextBtn.style.visibility = canMergeDown ? 'visible' : 'hidden';
+    nextBtn.className = canMergeDown
+      ? `edit-nav-arrow ${mergeDownClass(rawText)}` : 'edit-nav-arrow';
+    if (canMergeDown)
+      nextBtn.addEventListener('click', () => mergeWithNext(postIndex, taEl ? taEl.value : rawText));
+  } else {
+    nextBtn.className = 'edit-nav-arrow';
+    nextBtn.textContent = '→';
+    nextBtn.setAttribute('aria-label', '次の編集に進む');
+    nextBtn.style.visibility = hasNext ? 'visible' : 'hidden';
+    if (hasNext) nextBtn.addEventListener('click', () => navigateHistory(postIndex, 1));
+  }
   editNav.appendChild(nextBtn);
 
   cardLeft.appendChild(editNav);
@@ -547,6 +609,7 @@ function createCard(postIndex, total) {
   // ── Body ────────────────────────────────────────────
   if (isEditing) {
     const ta = document.createElement('textarea');
+    taEl = ta; // expose to merge-button closures
     ta.className = 'edit-textarea';
     ta.value     = rawText;
 
@@ -561,6 +624,8 @@ function createCard(postIndex, total) {
       const p = u / LIMIT;
       charSpan.textContent = `${u}/280`;
       charSpan.className   = `tweet-chars ${p >= 1 ? 'danger' : p >= 0.9 ? 'warn' : 'ok'}`;
+      if (canMergeUp)   prevBtn.className = `edit-nav-arrow ${mergeUpClass(ta.value)}`;
+      if (canMergeDown) nextBtn.className = `edit-nav-arrow ${mergeDownClass(ta.value)}`;
     });
 
     // Click-outside detection via focusout

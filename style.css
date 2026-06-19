@@ -383,6 +383,14 @@ html {
   color: var(--blue);
 }
 
+/* Merge button color modifiers (edit mode) */
+.edit-nav-arrow.merge-up     { color: var(--green); }
+.edit-nav-arrow.merge-down   { color: var(--blue);  }
+.edit-nav-arrow.merge-danger { color: var(--red);   }
+.edit-nav-arrow.merge-up:hover     { background: rgba(0, 186, 124, 0.12);  color: var(--green); }
+.edit-nav-arrow.merge-down:hover   { background: rgba(29, 155, 240, 0.12); color: var(--blue);  }
+.edit-nav-arrow.merge-danger:hover { background: rgba(224, 36, 94, 0.12);  color: var(--red);   }
+
 .edit-btn {
   font-size: 11px;
   font-weight: 700;
