@@ -347,10 +347,21 @@ html {
   background: var(--surface);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.edit-guide-warn {
-  color: var(--red);
+.edit-guide-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1.5px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: middle;
 }
 
 .edit-guide.hidden {
