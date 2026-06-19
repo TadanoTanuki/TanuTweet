@@ -81,6 +81,10 @@ function findSplitPos(text, limit) {
 let posts = [];
 // postSeparators[i] = the newline(s) originally between posts[i] and posts[i+1] ('' | '\n' | '\n\n')
 let postSeparators = [];
+// per-card edit history: entries[] = committed text snapshots, cursor = current position
+let cardHistories = [];
+let editingIndex  = -1;   // index of card in edit mode, -1 = none
+let editStartText = '';   // text when edit mode was entered (change detection)
 
 // Scan trimmedText to find the whitespace gap between adjacent post texts and
 // extract only its newline structure (at most '\n\n').
@@ -106,11 +110,14 @@ function effectiveLimitForN(n) {
 }
 
 function resetPostsFromText(text) {
+  editingIndex  = -1;
+  editStartText = '';
   const trimmed = text.trim();
-  if (!trimmed) { posts = []; postSeparators = []; return; }
+  if (!trimmed) { posts = []; postSeparators = []; cardHistories = []; return; }
   if (!toggleEl.checked) {
     posts = doSplit(trimmed, LIMIT);
     postSeparators = buildSeparators(trimmed, posts);
+    cardHistories  = posts.map(t => ({ entries: [t], cursor: 0 }));
     return;
   }
   let total = doSplit(trimmed, LIMIT).length;
@@ -122,6 +129,50 @@ function resetPostsFromText(text) {
   }
   posts = result;
   postSeparators = buildSeparators(trimmed, posts);
+  cardHistories  = posts.map(t => ({ entries: [t], cursor: 0 }));
+}
+
+// ── Edit-mode actions ─────────────────────────────────────────────────────────
+function enterEditMode(postIndex) {
+  if (editingIndex >= 0) return;
+  editingIndex  = postIndex;
+  editStartText = posts[postIndex];
+  renderFromPosts();
+}
+
+function exitEditMode(save, newText) {
+  const idx = editingIndex;
+  if (idx < 0) return;
+  if (save && newText !== undefined && newText !== editStartText) {
+    const hist = cardHistories[idx];
+    const newEntries = [...hist.entries.slice(0, hist.cursor + 1), newText];
+    cardHistories[idx] = { entries: newEntries, cursor: newEntries.length - 1 };
+    posts[idx] = newText;
+  }
+  editingIndex  = -1;
+  editStartText = '';
+  renderFromPosts();
+}
+
+function navigateHistory(postIndex, dir) {
+  const hist = cardHistories[postIndex];
+  if (!hist) return;
+  const next = hist.cursor + dir;
+  if (next < 0 || next >= hist.entries.length) return;
+  cardHistories[postIndex] = { ...hist, cursor: next };
+  posts[postIndex] = hist.entries[next];
+  renderFromPosts();
+}
+
+function showSaveDialog(postIndex, newText) {
+  dialogEl.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  const cleanup = () => {
+    dialogEl.classList.add('hidden');
+    document.body.style.overflow = '';
+  };
+  dialogSaveBtn.onclick    = () => { cleanup(); exitEditMode(true,  newText); };
+  dialogDiscardBtn.onclick = () => { cleanup(); exitEditMode(false); };
 }
 
 // ── Break-point analysis ──────────────────────────────────────────────────────
@@ -257,8 +308,8 @@ function applyBackSplit(postIndex, charPos) {
   }
 
   posts = [...headPosts, ...tailSplit];
-  // Back-split positions are mid-text cuts, so all new separators are ''.
   postSeparators = [...headSeps, ...new Array(tailSplit.length).fill('')];
+  cardHistories  = posts.map(t => ({ entries: [t], cursor: 0 }));
 
   renderFromPosts();
 }
@@ -276,13 +327,13 @@ function applyFrontSplit(postIndex, charPos) {
 
   if (newCurrent.trim()) {
     posts[postIndex] = newCurrent;
-    // The new boundary is a mid-text cut with no original newline.
     postSeparators[postIndex - 1] = '';
   } else {
     posts.splice(postIndex, 1);
     postSeparators.splice(postIndex - 1, 1);
   }
 
+  cardHistories = posts.map(t => ({ entries: [t], cursor: 0 }));
   renderFromPosts();
 }
 
@@ -404,40 +455,146 @@ function buildCardBody(rawText, postIndex, total) {
 }
 
 function createCard(postIndex, total) {
-  const rawText = posts[postIndex];
-  const suffix = toggleEl.checked ? ` (${postIndex + 1}/${total})` : '';
+  const rawText     = posts[postIndex];
+  const suffix      = toggleEl.checked ? ` (${postIndex + 1}/${total})` : '';
   const displayText = rawText + suffix;
-  const units = countUnits(displayText);
-  const pct = units / LIMIT;
-  const charClass = pct >= 1 ? 'danger' : pct >= 0.9 ? 'warn' : 'ok';
-  const barWidth = Math.min(100, Math.round(pct * 100));
+  const isEditing   = postIndex === editingIndex;
+  const inactive    = editingIndex >= 0 && !isEditing;
+  const hist        = cardHistories[postIndex] || { entries: [rawText], cursor: 0 };
+  const hasPrev     = !isEditing && hist.cursor > 0;
+  const hasNext     = !isEditing && hist.cursor < hist.entries.length - 1;
+
+  let units    = countUnits(displayText);
+  let pct      = units / LIMIT;
+  let charClass = pct >= 1 ? 'danger' : pct >= 0.9 ? 'warn' : 'ok';
 
   const card = document.createElement('article');
-  card.className = 'tweet-card';
-  card.style.animationDelay = `${postIndex * 30}ms`;
+  card.className = [
+    'tweet-card',
+    isEditing ? 'is-editing'   : '',
+    inactive  ? 'card-inactive': '',
+  ].filter(Boolean).join(' ');
+  if (!inactive) card.style.animationDelay = `${postIndex * 30}ms`;
 
-  const header = document.createElement('div');
+  // ── Header ──────────────────────────────────────────
+  const header   = document.createElement('div');
   header.className = 'tweet-card-header';
-  header.innerHTML = `
-    <span class="tweet-number">Post ${postIndex + 1} / ${total}</span>
-    <div class="tweet-card-actions">
-      <span class="tweet-chars ${charClass}">${units}/280</span>
-      <button class="btn btn-copy" type="button" aria-label="この Post をコピー">
-        ${COPY_ICON} コピー
-      </button>
-    </div>
-  `;
-  header.querySelector('.btn-copy').addEventListener('click', async function () {
+
+  // Left: "Post n/n" + [ ← 編集/確定 → ]
+  const cardLeft = document.createElement('div');
+  cardLeft.className = 'card-left';
+
+  const numSpan = document.createElement('span');
+  numSpan.className   = 'tweet-number';
+  numSpan.textContent = `Post ${postIndex + 1} / ${total}`;
+  cardLeft.appendChild(numSpan);
+
+  const editNav = document.createElement('div');
+  editNav.className = 'edit-nav';
+
+  const prevBtn = document.createElement('button');
+  prevBtn.type = 'button';
+  prevBtn.className = 'edit-nav-arrow';
+  prevBtn.textContent = '←';
+  prevBtn.setAttribute('aria-label', '前の編集に戻る');
+  prevBtn.style.visibility = hasPrev ? 'visible' : 'hidden';
+  if (hasPrev) prevBtn.addEventListener('click', () => navigateHistory(postIndex, -1));
+  editNav.appendChild(prevBtn);
+
+  const editBtn = document.createElement('button');
+  editBtn.type      = 'button';
+  editBtn.className = isEditing ? 'edit-btn is-confirm' : 'edit-btn';
+  editBtn.textContent = isEditing ? '確定' : '編集';
+  editBtn.disabled  = inactive;
+  editNav.appendChild(editBtn);
+
+  const nextBtn = document.createElement('button');
+  nextBtn.type = 'button';
+  nextBtn.className = 'edit-nav-arrow';
+  nextBtn.textContent = '→';
+  nextBtn.setAttribute('aria-label', '次の編集に進む');
+  nextBtn.style.visibility = hasNext ? 'visible' : 'hidden';
+  if (hasNext) nextBtn.addEventListener('click', () => navigateHistory(postIndex, 1));
+  editNav.appendChild(nextBtn);
+
+  cardLeft.appendChild(editNav);
+  header.appendChild(cardLeft);
+
+  // Right: char count + copy
+  const actions = document.createElement('div');
+  actions.className = 'tweet-card-actions';
+
+  const charSpan = document.createElement('span');
+  charSpan.className   = `tweet-chars ${charClass}`;
+  charSpan.textContent = `${units}/280`;
+  actions.appendChild(charSpan);
+
+  const copyBtn = document.createElement('button');
+  copyBtn.type      = 'button';
+  copyBtn.className = 'btn btn-copy';
+  copyBtn.setAttribute('aria-label', 'この Post をコピー');
+  copyBtn.innerHTML = `${COPY_ICON} コピー`;
+  copyBtn.disabled  = isEditing;
+  copyBtn.addEventListener('click', async function () {
+    if (isEditing) return;
     try { await copyToClipboard(displayText); flashCopied(this, true); } catch {}
   });
+  actions.appendChild(copyBtn);
 
+  header.appendChild(actions);
   card.appendChild(header);
-  card.appendChild(buildCardBody(rawText, postIndex, total));
 
-  const progress = document.createElement('div');
-  progress.className = 'tweet-progress';
-  progress.innerHTML = `<div class="tweet-progress-bar ${charClass}" style="width:${barWidth}%"></div>`;
-  card.appendChild(progress);
+  // ── Body ────────────────────────────────────────────
+  if (isEditing) {
+    const ta = document.createElement('textarea');
+    ta.className = 'edit-textarea';
+    ta.value     = rawText;
+
+    const autoResize = () => {
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+    };
+
+    ta.addEventListener('input', () => {
+      autoResize();
+      const u = countUnits(ta.value);
+      const p = u / LIMIT;
+      charSpan.textContent = `${u}/280`;
+      charSpan.className   = `tweet-chars ${p >= 1 ? 'danger' : p >= 0.9 ? 'warn' : 'ok'}`;
+    });
+
+    // Click-outside detection via focusout
+    ta.addEventListener('focusout', () => {
+      setTimeout(() => {
+        if (editingIndex !== postIndex) return;
+        const active = document.activeElement;
+        if (card.contains(active) || dialogEl.contains(active)) return;
+        const cur = ta.value;
+        if (cur === editStartText) { exitEditMode(false); return; }
+        showSaveDialog(postIndex, cur);
+      }, 80);
+    });
+
+    editBtn.addEventListener('click', () => exitEditMode(true, ta.value));
+
+    card.appendChild(ta);
+
+    requestAnimationFrame(() => {
+      autoResize();
+      ta.focus();
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+    });
+
+  } else {
+    editBtn.addEventListener('click', () => enterEditMode(postIndex));
+    card.appendChild(buildCardBody(rawText, postIndex, total));
+
+    const barWidth = Math.min(100, Math.round(pct * 100));
+    const progress = document.createElement('div');
+    progress.className = 'tweet-progress';
+    progress.innerHTML = `<div class="tweet-progress-bar ${charClass}" style="width:${barWidth}%"></div>`;
+    card.appendChild(progress);
+  }
 
   return card;
 }
@@ -486,8 +643,11 @@ const outputSection = document.getElementById('output-section');
 const emptyState    = document.getElementById('empty-state');
 const copyAllBtn    = document.getElementById('copy-all-btn');
 const tweetCountEl  = document.getElementById('tweet-count');
-const clearBtn      = document.getElementById('clear-btn');
-const toolbarArrow  = document.getElementById('toolbar-arrow');
+const clearBtn         = document.getElementById('clear-btn');
+const toolbarArrow     = document.getElementById('toolbar-arrow');
+const dialogEl         = document.getElementById('save-dialog');
+const dialogSaveBtn    = document.getElementById('dialog-save-btn');
+const dialogDiscardBtn = document.getElementById('dialog-discard-btn');
 
 copyAllBtn.addEventListener('click', async function () {
   if (!currentTweets.length) return;

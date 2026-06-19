@@ -78,6 +78,16 @@
     </section>
   </main>
 
+  <div id="save-dialog" class="dialog-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-msg">
+    <div class="dialog-box">
+      <p class="dialog-message" id="dialog-msg">変更内容を保存しますか？</p>
+      <div class="dialog-actions">
+        <button id="dialog-discard-btn" class="dialog-btn dialog-btn-discard">破棄</button>
+        <button id="dialog-save-btn"    class="dialog-btn dialog-btn-save">保存</button>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
