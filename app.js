@@ -104,9 +104,23 @@ function buildSeparators(trimmedText, postTexts) {
   return seps;
 }
 
+function getSuffix(postIndex, total) {
+  const mode = suffixSelectEl ? suffixSelectEl.value : 'number';
+  if (mode === 'none')   return '';
+  if (mode === 'number') return ` (${postIndex + 1}/${total})`;
+  if (mode === 'cont')   return postIndex < total - 1 ? ' （続）' : ' （終）';
+  if (mode === 'arrow')  return postIndex < total - 1 ? ' ↓' : '';
+  return '';
+}
+
 function effectiveLimitForN(n) {
-  if (!toggleEl || !toggleEl.checked || n === 0) return LIMIT;
-  return LIMIT - countUnits(` (${n}/${n})`);
+  if (n === 0) return LIMIT;
+  const mode = suffixSelectEl ? suffixSelectEl.value : 'number';
+  if (mode === 'none')   return LIMIT;
+  if (mode === 'number') return LIMIT - countUnits(` (${n}/${n})`);
+  if (mode === 'cont')   return LIMIT - countUnits(' （続）');
+  if (mode === 'arrow')  return LIMIT - countUnits(' ↓');
+  return LIMIT;
 }
 
 function resetPostsFromText(text) {
@@ -114,7 +128,7 @@ function resetPostsFromText(text) {
   editStartText = '';
   const trimmed = text.trim();
   if (!trimmed) { posts = []; postSeparators = []; cardHistories = []; return; }
-  if (!toggleEl.checked) {
+  if (!suffixSelectEl || suffixSelectEl.value === 'none') {
     posts = doSplit(trimmed, LIMIT);
     postSeparators = buildSeparators(trimmed, posts);
     cardHistories  = posts.map(t => ({ entries: [t], cursor: 0 }));
@@ -276,8 +290,7 @@ function getSplitSuggestions(postIndex) {
   let canMergeAll = false;
   if (postIndex > 0) {
     const prevUnits = countUnits(posts[postIndex - 1]);
-    const prevSuffixUnits = toggleEl.checked
-      ? countUnits(` (${postIndex}/${posts.length})`) : 0;
+    const prevSuffixUnits = countUnits(getSuffix(postIndex - 1, posts.length));
     const prevRemaining = LIMIT - prevUnits - prevSuffixUnits;
     const sepUnits = countUnits(postSeparators[postIndex - 1] ?? '');
     canMergeAll = sepUnits + countUnits(text) <= prevRemaining;
@@ -297,10 +310,7 @@ function getSplitSuggestions(postIndex) {
   let front = [];
   if (postIndex > 0) {
     const prevUnits = countUnits(posts[postIndex - 1]);
-    // Account for numbering suffix on the previous post
-    const prevSuffixUnits = toggleEl.checked
-      ? countUnits(` (${postIndex}/${posts.length})`)
-      : 0;
+    const prevSuffixUnits = countUnits(getSuffix(postIndex - 1, posts.length));
     const prevRemaining = LIMIT - prevUnits - prevSuffixUnits;
 
     if (prevRemaining >= 15) {
@@ -333,7 +343,7 @@ function applyBackSplit(postIndex, charPos) {
   const headSeps  = postSeparators.slice(0, postIndex); // separators before split point
 
   let tailSplit;
-  if (!toggleEl.checked) {
+  if (!suffixSelectEl || suffixSelectEl.value === 'none') {
     tailSplit = doSplit(tailText, LIMIT);
   } else {
     let total = headPosts.length + doSplit(tailText, LIMIT).length;
@@ -461,10 +471,11 @@ function buildCardBody(rawText, postIndex, total) {
     }
   }
 
-  if (toggleEl.checked) {
+  const suffixStr = getSuffix(postIndex, total);
+  if (suffixStr) {
     const suffix = document.createElement('span');
     suffix.className = 'tweet-suffix';
-    suffix.textContent = ` (${postIndex + 1}/${total})`;
+    suffix.textContent = suffixStr;
     wrapper.appendChild(suffix);
   }
 
@@ -494,7 +505,7 @@ function buildCardBody(rawText, postIndex, total) {
 
 function createCard(postIndex, total) {
   const rawText     = posts[postIndex].replace(/ \(\d+\/\d+\)\s*$/, '');
-  const suffix      = toggleEl.checked ? ` (${postIndex + 1}/${total})` : '';
+  const suffix      = getSuffix(postIndex, total);
   const displayText = rawText + suffix;
   const isEditing   = postIndex === editingIndex;
   const inactive    = editingIndex >= 0 && !isEditing;
@@ -734,7 +745,7 @@ function renderFromPosts() {
   copyAllBtn.disabled = false;
   currentTweets = posts.map((t, i) => {
     const clean = t.replace(/ \(\d+\/\d+\)\s*$/, '');
-    return toggleEl.checked ? `${clean} (${i + 1}/${total})` : clean;
+    return clean + getSuffix(i, total);
   });
 
   const frag = document.createDocumentFragment();
@@ -754,7 +765,7 @@ function render() {
 // ── DOM refs & event wiring ───────────────────────────────────────────────────
 const textareaEl    = document.getElementById('input-text');
 const totalCharsEl  = document.getElementById('total-chars');
-const toggleEl      = document.getElementById('numbering-toggle');
+const suffixSelectEl = document.getElementById('numbering-select');
 const outputSection = document.getElementById('output-section');
 const emptyState    = document.getElementById('empty-state');
 const editGuideEl   = document.getElementById('edit-guide');
@@ -778,7 +789,7 @@ clearBtn.addEventListener('click', () => {
 });
 
 textareaEl.addEventListener('input', render);
-toggleEl.addEventListener('change', render);
+suffixSelectEl.addEventListener('change', render);
 
 render();
 

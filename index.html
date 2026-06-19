@@ -52,11 +52,12 @@
       ></textarea>
 
       <div class="toolbar">
-        <label class="toggle-label">
-          <input type="checkbox" id="numbering-toggle" class="toggle-input" checked>
-          <span class="toggle-track"></span>
-          <span class="toggle-text">(1/n) 番号を付ける</span>
-        </label>
+        <select id="numbering-select" class="suffix-select">
+          <option value="none">何もつけない</option>
+          <option value="number" selected>(1/n) 番号を付ける</option>
+          <option value="cont">（続）（終）を付ける</option>
+          <option value="arrow">↓ を付ける</option>
+        </select>
 
         <div class="toolbar-right">
           <span class="total-chars" id="total-chars">0 文字</span>

@@ -193,6 +193,24 @@ html {
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Suffix select ───────────────────────────── */
+.suffix-select {
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.suffix-select:focus {
+  border-color: var(--border-focus);
+}
+
 /* ── Toggle ──────────────────────────────────── */
 .toggle-label {
   display: flex;
