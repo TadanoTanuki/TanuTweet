@@ -1,4 +1,4 @@
-const CACHE = 'tanutweet-v1';
+const CACHE = 'tanutweet-v2';
 const ASSETS = [
   './',
   './index.html',
