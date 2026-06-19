@@ -14,7 +14,6 @@
   --text: #0f1419;
   --text-secondary: #536471;
   --green: #00ba7c;
-  --yellow: #4d5aaf;
   --red: #e0245e;
   --radius-card: 16px;
   --radius-sm: 8px;
@@ -585,7 +584,6 @@ html {
 }
 
 .tweet-chars.ok     { color: var(--text-secondary); }
-.tweet-chars.warn   { color: var(--yellow); }
 .tweet-chars.danger { color: var(--red); }
 
 .tweet-card-body {
@@ -613,7 +611,6 @@ html {
 }
 
 .tweet-progress-bar.ok     { background: var(--blue); }
-.tweet-progress-bar.warn   { background: var(--yellow); }
 .tweet-progress-bar.danger { background: var(--red); }
 
 /* ── Split suggestions (inline) ──────────────────── */

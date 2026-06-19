@@ -504,7 +504,7 @@ function createCard(postIndex, total) {
 
   let units    = countUnits(displayText);
   let pct      = units / LIMIT;
-  let charClass = pct >= 1 ? 'danger' : pct >= 0.9 ? 'warn' : 'ok';
+  let charClass = pct >= 1 ? 'danger' : 'ok';
 
   const card = document.createElement('article');
   card.className = [
@@ -669,7 +669,7 @@ function createCard(postIndex, total) {
       const u = countUnits(ta.value);
       const p = u / LIMIT;
       charSpan.textContent = `${u}/280`;
-      charSpan.className   = `tweet-chars ${p >= 1 ? 'danger' : p >= 0.9 ? 'warn' : 'ok'}`;
+      charSpan.className   = `tweet-chars ${p >= 1 ? 'danger' : 'ok'}`;
       updateMergeBtnColors();
     });
     ta.addEventListener('keyup',   updateMergeBtnColors);
