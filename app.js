@@ -471,6 +471,7 @@ function renderFromPosts() {
 function render() {
   const text = textareaEl.value;
   totalCharsEl.textContent = `${countUnits(text).toLocaleString()} 文字`;
+  clearBtn.disabled = text.length === 0;
   resetPostsFromText(text);
   renderFromPosts();
 }
@@ -483,10 +484,17 @@ const outputSection = document.getElementById('output-section');
 const emptyState    = document.getElementById('empty-state');
 const copyAllBtn    = document.getElementById('copy-all-btn');
 const tweetCountEl  = document.getElementById('tweet-count');
+const clearBtn      = document.getElementById('clear-btn');
 
 copyAllBtn.addEventListener('click', async function () {
   if (!currentTweets.length) return;
   try { await copyToClipboard(currentTweets.join('\n\n')); flashCopied(this, false); } catch {}
+});
+
+clearBtn.addEventListener('click', () => {
+  textareaEl.value = '';
+  render();
+  textareaEl.focus();
 });
 
 textareaEl.addEventListener('input', render);

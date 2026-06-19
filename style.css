@@ -271,6 +271,28 @@ html {
   cursor: not-allowed;
 }
 
+.btn-clear {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 14px;
+  gap: 4px;
+}
+
+.btn-clear:hover:not(:disabled) {
+  color: var(--red);
+  border-color: var(--red);
+  background: rgba(224, 36, 94, 0.06);
+}
+
+.btn-clear:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
 .btn-copy {
   background: transparent;
   color: var(--text-secondary);
