@@ -125,14 +125,14 @@ html {
 .input-label {
   font-size: 13px;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: var(--blue);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .total-chars {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--blue);
   font-variant-numeric: tabular-nums;
 }
 
@@ -181,14 +181,13 @@ html {
 
 .toolbar-arrow {
   font-size: 13px;
-  color: var(--text-secondary);
-  opacity: 0.5;
+  color: var(--blue);
   user-select: none;
 }
 
 .tweet-count {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--blue);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -291,8 +290,8 @@ html {
 
 .btn-clear {
   background: transparent;
-  color: var(--text-secondary);
-  border: 1.5px solid var(--border);
+  color: var(--blue);
+  border: 1.5px solid var(--blue);
   padding: 4px 10px;
   font-size: 12px;
   font-weight: 600;
