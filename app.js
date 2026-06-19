@@ -724,8 +724,10 @@ function renderFromPosts() {
     tweetCountEl.textContent = '';
     toolbarArrow.hidden = true;
     currentTweets = [];
+    editGuideEl.classList.add('hidden');
     return;
   }
+  editGuideEl.classList.remove('hidden');
 
   toolbarArrow.hidden = false;
   tweetCountEl.textContent = `${total} Posts`;
@@ -755,6 +757,7 @@ const totalCharsEl  = document.getElementById('total-chars');
 const toggleEl      = document.getElementById('numbering-toggle');
 const outputSection = document.getElementById('output-section');
 const emptyState    = document.getElementById('empty-state');
+const editGuideEl   = document.getElementById('edit-guide');
 const copyAllBtn    = document.getElementById('copy-all-btn');
 const tweetCountEl  = document.getElementById('tweet-count');
 const clearBtn         = document.getElementById('clear-btn');

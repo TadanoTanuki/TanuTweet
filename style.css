@@ -339,6 +339,24 @@ html {
   gap: 12px;
 }
 
+.edit-guide {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  padding: 8px 12px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+
+.edit-guide-warn {
+  color: var(--red);
+}
+
+.edit-guide.hidden {
+  display: none;
+}
+
 .empty-state {
   text-align: center;
   padding: 56px 24px;
