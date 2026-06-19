@@ -172,6 +172,13 @@ html {
   gap: 12px;
 }
 
+.toolbar-arrow {
+  font-size: 13px;
+  color: var(--text-secondary);
+  opacity: 0.5;
+  user-select: none;
+}
+
 .tweet-count {
   font-size: 13px;
   color: var(--text-secondary);

@@ -452,10 +452,12 @@ function renderFromPosts() {
     outputSection.appendChild(emptyState);
     copyAllBtn.disabled = true;
     tweetCountEl.textContent = '';
+    toolbarArrow.hidden = true;
     currentTweets = [];
     return;
   }
 
+  toolbarArrow.hidden = false;
   tweetCountEl.textContent = `${total} Posts`;
   copyAllBtn.disabled = false;
   currentTweets = posts.map((t, i) =>
@@ -485,6 +487,7 @@ const emptyState    = document.getElementById('empty-state');
 const copyAllBtn    = document.getElementById('copy-all-btn');
 const tweetCountEl  = document.getElementById('tweet-count');
 const clearBtn      = document.getElementById('clear-btn');
+const toolbarArrow  = document.getElementById('toolbar-arrow');
 
 copyAllBtn.addEventListener('click', async function () {
   if (!currentTweets.length) return;
