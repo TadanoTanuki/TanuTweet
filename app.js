@@ -532,6 +532,8 @@ function createCard(postIndex, total) {
 
   // taEl is assigned when the edit textarea is created; merge-button closures capture it by ref
   let taEl = null;
+  // selectionStart becomes unreliable after blur (button click shifts focus), so save on mousedown
+  let lastCursorPos = 0;
 
   // Merge color helpers: check only the portion being merged (cursor-split)
   const mergeUpClass = (text, pos) => {
@@ -558,12 +560,14 @@ function createCard(postIndex, total) {
     prevBtn.style.visibility = canMergeUp ? 'visible' : 'hidden';
     prevBtn.className = canMergeUp
       ? `edit-nav-arrow ${mergeUpClass(rawText, rawText.length)}` : 'edit-nav-arrow';
-    if (canMergeUp)
-      prevBtn.addEventListener('click', () => {
-        const text = taEl ? taEl.value : rawText;
-        const pos  = taEl ? taEl.selectionStart : text.length;
-        mergeWithPrev(postIndex, text, pos);
+    if (canMergeUp) {
+      prevBtn.addEventListener('mousedown', () => {
+        if (taEl) lastCursorPos = taEl.selectionStart;
       });
+      prevBtn.addEventListener('click', () => {
+        mergeWithPrev(postIndex, taEl ? taEl.value : rawText, lastCursorPos);
+      });
+    }
   } else {
     prevBtn.className = 'edit-nav-arrow';
     prevBtn.textContent = '←';
@@ -588,12 +592,14 @@ function createCard(postIndex, total) {
     nextBtn.style.visibility = canMergeDown ? 'visible' : 'hidden';
     nextBtn.className = canMergeDown
       ? `edit-nav-arrow ${mergeDownClass(rawText, rawText.length)}` : 'edit-nav-arrow';
-    if (canMergeDown)
-      nextBtn.addEventListener('click', () => {
-        const text = taEl ? taEl.value : rawText;
-        const pos  = taEl ? taEl.selectionStart : text.length;
-        mergeWithNext(postIndex, text, pos);
+    if (canMergeDown) {
+      nextBtn.addEventListener('mousedown', () => {
+        if (taEl) lastCursorPos = taEl.selectionStart;
       });
+      nextBtn.addEventListener('click', () => {
+        mergeWithNext(postIndex, taEl ? taEl.value : rawText, lastCursorPos);
+      });
+    }
   } else {
     nextBtn.className = 'edit-nav-arrow';
     nextBtn.textContent = '→';
@@ -643,9 +649,9 @@ function createCard(postIndex, total) {
     };
 
     const updateMergeBtnColors = () => {
-      const pos = ta.selectionStart;
-      if (canMergeUp)   prevBtn.className = `edit-nav-arrow ${mergeUpClass(ta.value, pos)}`;
-      if (canMergeDown) nextBtn.className = `edit-nav-arrow ${mergeDownClass(ta.value, pos)}`;
+      lastCursorPos = ta.selectionStart;
+      if (canMergeUp)   prevBtn.className = `edit-nav-arrow ${mergeUpClass(ta.value, lastCursorPos)}`;
+      if (canMergeDown) nextBtn.className = `edit-nav-arrow ${mergeDownClass(ta.value, lastCursorPos)}`;
     };
 
     ta.addEventListener('input', () => {
