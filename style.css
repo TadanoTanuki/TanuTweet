@@ -81,13 +81,15 @@ html {
   color: var(--text);
 }
 .app-version {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
-  color: var(--text-muted, #8899aa);
+  color: var(--text-secondary);
   letter-spacing: 0;
 }
 
 .app-subtitle {
+  display: flex;
+  justify-content: space-between;
   font-size: 12px;
   color: var(--text-secondary);
   margin-top: 2px;
